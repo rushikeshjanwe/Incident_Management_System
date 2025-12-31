@@ -61,7 +61,7 @@ public class IncidentService {
             userRepository.findById(request.getAssigneeId()).ifPresent(user -> {
                 incident.setAssigneeId(user.getId());
                 incident.setAssigneeName(user.getUsername());
-                incident.setTeamId(user.getTeamId());
+                incident.setTeamId(Long.valueOf(user.getTeamId()));
                 incident.setTeamName(user.getTeamName());
             });
         }
@@ -214,7 +214,7 @@ public class IncidentService {
 
         incident.setAssigneeId(user.getId());
         incident.setAssigneeName(user.getUsername());
-        incident.setTeamId(user.getTeamId());
+        incident.setTeamId(Long.valueOf(user.getTeamId()));
         incident.setTeamName(user.getTeamName());
 
         Incident saved = incidentRepository.save(incident);

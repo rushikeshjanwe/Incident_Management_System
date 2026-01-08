@@ -5,9 +5,9 @@ spring:
   application:
     name: incident-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/incident_db
-    username: postgres
-    password: 6233
+    url: jdbc:postgresql://${DB_HOST:localhost}:5432/incident_db
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:6233}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -18,14 +18,14 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: ${KAFKA_SERVERS:localhost:9092}
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
   data:
     redis:
-      host: localhost
-      port: 6379
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 jwt:
   secret: mySecretKeyForJWTTokenGenerationWhichIsVeryLongAndSecure123456789

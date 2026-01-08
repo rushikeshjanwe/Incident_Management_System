@@ -18,20 +18,80 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: incident-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  kafka:
+    image: redpandadata/redpanda:latest
+    container_name: incident-kafka
+    command:
+      - redpanda
+      - start
+      - --smp
+      - '1'
+      - --memory
+      - '512M'
+      - --overprovisioned
+      - --node-id
+      - '0'
+      - --kafka-addr
+      - PLAINTEXT://0.0.0.0:9092
+      - --advertise-kafka-addr
+      - PLAINTEXT://kafka:9092
+    ports:
+      - "9092:9092"
+    healthcheck:
+      test: ["CMD", "rpk", "cluster", "health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   incident-service:
-    build: ./incident-service
+    build:
+      context: ./incident-service
+      dockerfile: Dockerfile
     container_name: incident-service
-    depends_on:
-      postgres:
-        condition: service_healthy
     ports:
       - "8081:8081"
     environment:
-      POSTGRES_HOST: postgres
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: incident_db
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      KAFKA_SERVERS: kafka:9092
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    restart: on-failure
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+    container_name: notification-service
+    ports:
+      - "8082:8082"
+    environment:
+      KAFKA_SERVERS: kafka:9092
+    depends_on:
+      kafka:
+        condition: service_healthy
+      incident-service:
+        condition: service_started
+    restart: on-failure
 
 volumes:
   postgres_data:

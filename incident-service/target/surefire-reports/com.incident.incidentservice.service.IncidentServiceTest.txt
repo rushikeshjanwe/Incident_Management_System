@@ -1,0 +1,64 @@
+-------------------------------------------------------------------------------
+Test set: com.incident.incidentservice.service.IncidentServiceTest
+-------------------------------------------------------------------------------
+Tests run: 7, Failures: 1, Errors: 5, Skipped: 0, Time elapsed: 5.347 s <<< FAILURE! -- in com.incident.incidentservice.service.IncidentServiceTest
+com.incident.incidentservice.service.IncidentServiceTest.acknowledge_Success -- Time elapsed: 4.506 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.incident.incidentservice.enums.Severity.name()" because the return value of "com.incident.incidentservice.entity.Incident.getSeverity()" is null
+	at com.incident.incidentservice.service.IncidentService.publishEvent(IncidentService.java:282)
+	at com.incident.incidentservice.service.IncidentService.acknowledge(IncidentService.java:159)
+	at com.incident.incidentservice.service.IncidentServiceTest.acknowledge_Success(IncidentServiceTest.java:106)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.incident.incidentservice.service.IncidentServiceTest.getById_Success -- Time elapsed: 0.029 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.incident.incidentservice.service.IncidentCacheService.getFromCache(java.lang.Long)" because "this.cacheService" is null
+	at com.incident.incidentservice.service.IncidentService.getById(IncidentService.java:82)
+	at com.incident.incidentservice.service.IncidentServiceTest.getById_Success(IncidentServiceTest.java:81)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.incident.incidentservice.service.IncidentServiceTest.getById_NotFound -- Time elapsed: 0.400 s <<< FAILURE!
+java.lang.AssertionError: 
+
+Expecting actual throwable to be an instance of:
+  com.incident.incidentservice.exception.IncidentNotFoundException
+but was:
+  java.lang.NullPointerException: Cannot invoke "com.incident.incidentservice.service.IncidentCacheService.getFromCache(java.lang.Long)" because "this.cacheService" is null
+	at com.incident.incidentservice.service.IncidentService.getById(IncidentService.java:82)
+	at com.incident.incidentservice.service.IncidentServiceTest.lambda$getById_NotFound$0(IncidentServiceTest.java:90)
+	at org.assertj.core.api.ThrowableAssert.catchThrowable(ThrowableAssert.java:63)
+	...(75 remaining lines not displayed - this can be changed with Assertions.setMaxStackTraceElementsDisplayed)
+	at com.incident.incidentservice.service.IncidentServiceTest.getById_NotFound(IncidentServiceTest.java:91)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.incident.incidentservice.service.IncidentServiceTest.resolve_Success -- Time elapsed: 0.033 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.incident.incidentservice.enums.Severity.name()" because the return value of "com.incident.incidentservice.entity.Incident.getSeverity()" is null
+	at com.incident.incidentservice.service.IncidentService.publishEvent(IncidentService.java:282)
+	at com.incident.incidentservice.service.IncidentService.resolve(IncidentService.java:181)
+	at com.incident.incidentservice.service.IncidentServiceTest.resolve_Success(IncidentServiceTest.java:132)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.incident.incidentservice.service.IncidentServiceTest.createIncident_Success -- Time elapsed: 0.045 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.incident.incidentservice.kafka.IncidentEventProducer.sendEvent(com.incident.incidentservice.event.IncidentEvent)" because "this.eventProducer" is null
+	at com.incident.incidentservice.service.IncidentService.publishEvent(IncidentService.java:287)
+	at com.incident.incidentservice.service.IncidentService.createIncident(IncidentService.java:72)
+	at com.incident.incidentservice.service.IncidentServiceTest.createIncident_Success(IncidentServiceTest.java:69)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+
+com.incident.incidentservice.service.IncidentServiceTest.escalate_Success -- Time elapsed: 0.030 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.incident.incidentservice.enums.Severity.name()" because the return value of "com.incident.incidentservice.entity.Incident.getSeverity()" is null
+	at com.incident.incidentservice.service.IncidentService.publishEvent(IncidentService.java:282)
+	at com.incident.incidentservice.service.IncidentService.escalate(IncidentService.java:242)
+	at com.incident.incidentservice.service.IncidentServiceTest.escalate_Success(IncidentServiceTest.java:149)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:568)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+

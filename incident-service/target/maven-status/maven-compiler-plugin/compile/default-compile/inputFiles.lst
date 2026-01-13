@@ -3,6 +3,7 @@ C:\Users\Rushikesh\Desktop\Incident-Management-System\incident-service\src\main\
 C:\Users\Rushikesh\Desktop\Incident-Management-System\incident-service\src\main\java\com\incident\incidentservice\entity\Incident.java
 C:\Users\Rushikesh\Desktop\Incident-Management-System\incident-service\src\main\java\com\incident\incidentservice\dto\UpdateIncidentRequest.java
 C:\Users\Rushikesh\Desktop\Incident-Management-System\incident-service\src\main\java\com\incident\incidentservice\entity\User.java
+C:\Users\Rushikesh\Desktop\Incident-Management-System\incident-service\src\main\java\com\incident\incidentservice\config\SwaggerConfig.java
 C:\Users\Rushikesh\Desktop\Incident-Management-System\incident-service\src\main\java\com\incident\incidentservice\event\IncidentEvent.java
 C:\Users\Rushikesh\Desktop\Incident-Management-System\incident-service\src\main\java\com\incident\incidentservice\exception\GlobalExceptionHandler.java
 C:\Users\Rushikesh\Desktop\Incident-Management-System\incident-service\src\main\java\com\incident\incidentservice\config\KafkaConfig.java

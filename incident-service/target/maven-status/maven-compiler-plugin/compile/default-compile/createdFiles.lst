@@ -32,6 +32,7 @@ com\incident\incidentservice\enums\Role.class
 com\incident\incidentservice\controller\IncidentController.class
 com\incident\incidentservice\dto\PagedResponse.class
 com\incident\incidentservice\entity\Incident$IncidentBuilder.class
+com\incident\incidentservice\config\SwaggerConfig.class
 com\incident\incidentservice\IncidentServiceApplication.class
 com\incident\incidentservice\dto\auth\RegisterRequest$RegisterRequestBuilder.class
 com\incident\incidentservice\dto\CreateIncidentRequest.class

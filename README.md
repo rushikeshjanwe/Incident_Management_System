@@ -1,23 +1,810 @@
+# 🚨 Incident Management System
+
+> A production-ready, microservices-based incident management platform built with modern technologies and best practices.
+
+[![Build Status](https://github.com/YOUR_USERNAME/incident-management-system/actions/workflows/build.yml/badge.svg)](https://github.com/YOUR_USERNAME/incident-management-system/actions)
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://openjdk.org/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![React](https://img.shields.io/badge/React-18-blue.svg)](https://reactjs.org/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 ---
 
-## 🔧 Postman Testing Guide
+## 📋 Table of Contents
 
-### Step 1: Download Postman Collection
+- [Quick Demo](#-quick-demo)
+- [What is This](#-what-is-this)
+- [Why I Built This](#-why-i-built-this)
+- [What I Learned](#-what-i-learned)
+- [Tech Stack](#️-tech-stack)
+- [System Architecture](#️-system-architecture)
+- [Project Structure](#-project-structure)
+- [Features](#-features)
+- [Getting Started](#-getting-started)
+- [API Reference](#-api-reference)
+- [Testing with Swagger](#-testing-with-swagger-ui)
+- [Testing with Postman](#-testing-with-postman)
+- [Testing with cURL](#-testing-with-curl)
+- [Production Debugging Guide](#-production-level-debugging-guide)
+- [Docker Commands](#-docker-commands)
+- [Development Workflow](#-development-workflow)
+- [Performance Metrics](#-performance-metrics)
+- [Future Roadmap](#-future-roadmap)
+- [Author](#-author)
 
-Import this collection into Postman or create requests manually.
+---
 
-### Step 2: Setup Environment Variables
+## 🎬 Quick Demo
+```bash
+# One command to run everything
+git clone https://github.com/YOUR_USERNAME/incident-management-system.git
+cd incident-management-system
+docker-compose up --build
 
-In Postman, create environment variables:
+# Access
+# Dashboard: http://localhost:3000
+# API Docs:  http://localhost:8081/swagger-ui.html
+# Login:     admin / admin123
+```
 
-| Variable | Initial Value |
-|----------|---------------|
+---
+
+## 📌 What is This?
+
+This is a **full-stack incident management system** similar to PagerDuty, ServiceNow, or OpsGenie. It helps IT teams:
+
+| Problem | Solution |
+|---------|----------|
+| Server goes down at 3 AM | 🔔 Instant notifications via Email, SMS, Slack |
+| Who's working on it? | 👤 Incident assignment & ownership |
+| Is it fixed yet? | 📊 Real-time status tracking |
+| Same issue happening again? | 📈 Incident history & patterns |
+| Taking too long to fix? | ⚡ Auto-escalation to managers |
+
+### Incident Lifecycle
+```
+┌───────────┐     ┌──────────────┐     ┌──────────┐     ┌────────┐
+│ TRIGGERED │ --> │ ACKNOWLEDGED │ --> │ RESOLVED │ --> │ CLOSED │
+└───────────┘     └──────────────┘     └──────────┘     └────────┘
+```
+
+1. **TRIGGERED:** Incident is created (e.g., "Database server down")
+2. **ACKNOWLEDGED:** Someone is looking at it
+3. **RESOLVED:** Problem is fixed
+4. **CLOSED:** Incident is archived
+
+---
+
+## 💡 Why I Built This
+
+I built this project to:
+
+1. **Learn Microservices Architecture:** Understanding how multiple services communicate
+2. **Implement Event-Driven Design:** Using Kafka for real-time notifications
+3. **Practice Caching Strategies:** Using Redis to improve API performance
+4. **Understand Security:** Implementing JWT authentication from scratch
+5. **Learn DevOps:** Docker containerization and CI/CD pipelines
+6. **Build a Portfolio Project:** Something real-world to show in interviews
+
+This is not just a CRUD application. It demonstrates:
+- How modern backend systems are designed
+- How different technologies work together
+- How to build scalable, production-ready applications
+
+---
+
+## 📚 What I Learned
+
+### 1. Spring Boot & REST APIs
+- Building RESTful APIs with proper HTTP methods (GET, POST, PATCH, PUT, DELETE)
+- Request validation using Jakarta Validation
+- Global exception handling with @ControllerAdvice
+- Pagination and sorting for large datasets
+
+### 2. Database & JPA
+- Entity relationships and mappings
+- Writing custom queries with @Query annotation
+- Database migrations and schema design
+- Connection pooling with HikariCP
+
+### 3. Security
+- JWT (JSON Web Token) authentication
+- Role-based access control (RBAC)
+- Password encryption with BCrypt
+- Securing REST endpoints
+
+### 4. Caching with Redis
+- Cache-aside pattern implementation
+- Cache invalidation strategies
+- Reduced API response time from 50-100ms to 1-2ms
+- Understanding when to cache and when not to
+
+### 5. Event-Driven Architecture with Kafka
+- Producer-Consumer pattern
+- Asynchronous communication between services
+- Event serialization/deserialization
+- Handling message failures
+
+### 6. Docker & DevOps
+- Writing Dockerfiles for Java applications
+- Docker Compose for multi-container orchestration
+- Environment variable management
+- CI/CD with GitHub Actions
+
+### 7. Frontend with React
+- Component-based architecture
+- State management with hooks
+- API integration with Axios
+- Responsive UI design
+
+---
+
+## 🛠️ Tech Stack
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              FRONTEND                                       │
+│                                                                             │
+│   React 18  •  Axios  •  React Router  •  CSS3                             │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                              BACKEND                                        │
+│                                                                             │
+│   Java 17  •  Spring Boot 3.2  •  Spring Security  •  Spring Data JPA     │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                              DATA LAYER                                     │
+│                                                                             │
+│   PostgreSQL 15 (Database)  •  Redis 7 (Cache)  •  Kafka (Events)         │
+│                                                                             │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                              DEVOPS                                         │
+│                                                                             │
+│   Docker  •  Docker Compose  •  GitHub Actions  •  Swagger/OpenAPI        │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+| Layer | Technology | Why I Chose It |
+|-------|------------|----------------|
+| **Backend** | Java 17, Spring Boot 3.2 | Industry standard, huge ecosystem |
+| **Database** | PostgreSQL 15 | ACID compliance, complex queries, JSON support |
+| **Cache** | Redis 7 | Sub-millisecond latency, simple API |
+| **Message Queue** | Apache Kafka | Durability, replayability, high throughput |
+| **Frontend** | React 18 | Component-based, large community, hooks |
+| **Auth** | JWT | Stateless, scalable, no server-side sessions |
+| **Docs** | Swagger/OpenAPI | Interactive API documentation |
+| **Containers** | Docker | Consistency across environments |
+| **CI/CD** | GitHub Actions | Free, integrated with GitHub |
+
+---
+
+## 🏗️ System Architecture
+```
+                                   ┌──────────────────┐
+                                   │   React App      │
+                                   │   Port 3000      │
+                                   └────────┬─────────┘
+                                            │
+                                            │ REST API
+                                            ▼
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                                                               │
+│                        INCIDENT-SERVICE (Port 8081)                          │
+│                                                                               │
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────┐   ┌─────────────────┐  │
+│  │    Auth     │   │  Incident   │   │   Redis     │   │     Kafka       │  │
+│  │ Controller  │   │ Controller  │   │   Cache     │   │    Producer     │  │
+│  │             │   │             │   │             │   │                 │  │
+│  │ • Register  │   │ • Create    │   │ • Get/Set   │   │ • Publish       │  │
+│  │ • Login     │   │ • Update    │   │ • Evict     │   │   Events        │  │
+│  │ • JWT Auth  │   │ • Lifecycle │   │ • 30min TTL │   │                 │  │
+│  └─────────────┘   └─────────────┘   └──────┬──────┘   └────────┬────────┘  │
+│                                             │                    │           │
+└─────────────────────────────────────────────┼────────────────────┼───────────┘
+                                              │                    │
+              ┌───────────────────────────────┤                    │
+              │                               │                    │
+              ▼                               ▼                    ▼
+     ┌─────────────────┐            ┌─────────────────┐   ┌─────────────────┐
+     │   PostgreSQL    │            │      Redis      │   │      Kafka      │
+     │   Port 5432     │            │   Port 6379     │   │   Port 9092     │
+     │                 │            │                 │   │                 │
+     │ • Users         │            │ • Incident      │   │ • incident-     │
+     │ • Incidents     │            │   Cache         │   │   events topic  │
+     │ • Audit Trail   │            │ • Fast Reads    │   │                 │
+     └─────────────────┘            └─────────────────┘   └────────┬────────┘
+                                                                   │
+                                                                   │ Consume
+                                                                   ▼
+                                    ┌───────────────────────────────────────────┐
+                                    │                                           │
+                                    │     NOTIFICATION-SERVICE (Port 8082)     │
+                                    │                                           │
+                                    │  ┌───────────┐ ┌───────┐ ┌─────────────┐ │
+                                    │  │   Email   │ │  SMS  │ │    Slack    │ │
+                                    │  │  Service  │ │Service│ │   Service   │ │
+                                    │  └───────────┘ └───────┘ └─────────────┘ │
+                                    │                                           │
+                                    └───────────────────────────────────────────┘
+```
+
+### How It Works
+
+1. **User** accesses React Dashboard or Swagger UI
+2. **React/Swagger** sends HTTP requests to incident-service
+3. **incident-service** handles business logic:
+   - Authenticates user via JWT
+   - Checks Redis cache first (fast!)
+   - If not in cache, queries PostgreSQL
+   - Publishes events to Kafka
+4. **notification-service** consumes Kafka events
+5. **Notifications** are sent via Email, SMS, Slack
+
+---
+
+## 📁 Project Structure
+```
+incident-management-system/
+│
+├── 📂 incident-service/                 # Main Backend Service (Spring Boot)
+│   ├── 📂 src/main/java/com/incident/incidentservice/
+│   │   ├── 📂 config/                   # Configuration classes
+│   │   │   ├── RedisConfig.java         # Redis cache configuration
+│   │   │   ├── SecurityConfig.java      # Spring Security + JWT config
+│   │   │   └── SwaggerConfig.java       # OpenAPI documentation
+│   │   │
+│   │   ├── 📂 controller/               # REST API endpoints
+│   │   │   ├── AuthController.java      # /api/auth/* endpoints
+│   │   │   └── IncidentController.java  # /api/incidents/* endpoints
+│   │   │
+│   │   ├── 📂 service/                  # Business logic layer
+│   │   │   ├── AuthService.java         # Registration, login, JWT
+│   │   │   ├── IncidentService.java     # Incident CRUD + lifecycle
+│   │   │   └── IncidentCacheService.java # Redis caching logic
+│   │   │
+│   │   ├── 📂 repository/               # Data access layer
+│   │   │   ├── UserRepository.java      # User database queries
+│   │   │   └── IncidentRepository.java  # Incident database queries
+│   │   │
+│   │   ├── 📂 entity/                   # JPA entities (database tables)
+│   │   │   ├── User.java                # Users table
+│   │   │   └── Incident.java            # Incidents table
+│   │   │
+│   │   ├── 📂 dto/                      # Data Transfer Objects
+│   │   │   ├── CreateIncidentRequest.java
+│   │   │   ├── UpdateIncidentRequest.java
+│   │   │   ├── IncidentResponse.java
+│   │   │   ├── ApiResponse.java         # Standard API response wrapper
+│   │   │   └── 📂 auth/
+│   │   │       ├── LoginRequest.java
+│   │   │       ├── RegisterRequest.java
+│   │   │       └── AuthResponse.java
+│   │   │
+│   │   ├── 📂 security/                 # JWT Authentication
+│   │   │   ├── JwtService.java          # Token generation & validation
+│   │   │   ├── JwtAuthenticationFilter.java # Request filter
+│   │   │   └── SecurityConfig.java      # Security rules
+│   │   │
+│   │   ├── 📂 kafka/                    # Event producer
+│   │   │   ├── IncidentEventProducer.java # Sends events to Kafka
+│   │   │   └── IncidentEvent.java       # Event data structure
+│   │   │
+│   │   ├── 📂 exception/                # Error handling
+│   │   │   ├── GlobalExceptionHandler.java
+│   │   │   ├── IncidentNotFoundException.java
+│   │   │   └── InvalidStatusTransitionException.java
+│   │   │
+│   │   ├── 📂 enums/                    # Enumerations
+│   │   │   ├── Severity.java            # P1, P2, P3, P4
+│   │   │   ├── IncidentStatus.java      # TRIGGERED, ACKNOWLEDGED, etc.
+│   │   │   └── Role.java                # ADMIN, USER, VIEWER
+│   │   │
+│   │   └── 📂 mapper/                   # Entity-DTO conversion
+│   │       └── IncidentMapper.java
+│   │
+│   ├── 📂 src/main/resources/
+│   │   └── application.yml              # App configuration
+│   │
+│   ├── 📂 src/test/java/                # Unit & integration tests
+│   ├── 📄 Dockerfile                    # Container build instructions
+│   └── 📄 pom.xml                       # Maven dependencies
+│
+├── 📂 notification-service/             # Kafka Consumer Service
+│   ├── 📂 src/main/java/com/incident/notification/
+│   │   ├── 📂 kafka/
+│   │   │   ├── IncidentEventConsumer.java # Listens to Kafka events
+│   │   │   └── IncidentEvent.java       # Event data structure
+│   │   │
+│   │   └── 📂 service/                  # Notification senders
+│   │       ├── EmailService.java        # Email notifications
+│   │       ├── SmsService.java          # SMS notifications
+│   │       └── SlackService.java        # Slack notifications
+│   │
+│   ├── 📂 src/main/resources/
+│   │   └── application.yml
+│   ├── 📄 Dockerfile
+│   └── 📄 pom.xml
+│
+├── 📂 incident-dashboard/               # React Frontend
+│   ├── 📂 src/
+│   │   ├── 📂 components/               # UI components
+│   │   │   ├── Login.js                 # Login page
+│   │   │   ├── Dashboard.js             # Main dashboard
+│   │   │   ├── IncidentList.js          # Incidents table
+│   │   │   ├── IncidentForm.js          # Create/edit form
+│   │   │   └── IncidentDetails.js       # Single incident view
+│   │   │
+│   │   ├── 📂 services/                 # API calls
+│   │   │   ├── api.js                   # Axios instance
+│   │   │   ├── authService.js           # Auth API calls
+│   │   │   └── incidentService.js       # Incident API calls
+│   │   │
+│   │   ├── App.js                       # Main component
+│   │   ├── App.css                      # Styles
+│   │   └── index.js                     # Entry point
+│   │
+│   ├── 📄 package.json                  # NPM dependencies
+│   └── 📄 Dockerfile
+│
+├── 📂 .github/workflows/                # CI/CD Pipeline
+│   └── 📄 build.yml                     # GitHub Actions workflow
+│
+├── 📄 docker-compose.yml                # Multi-container orchestration
+├── 📄 README.md                         # This file
+└── 📄 LICENSE                           # MIT License
+```
+
+### Key Files Explained
+
+| File | Purpose |
+|------|---------|
+| `IncidentController.java` | All incident REST endpoints |
+| `IncidentService.java` | Business logic for incidents |
+| `IncidentCacheService.java` | Redis caching implementation |
+| `JwtService.java` | JWT token creation & validation |
+| `IncidentEventProducer.java` | Sends events to Kafka |
+| `IncidentEventConsumer.java` | Receives events from Kafka |
+| `SecurityConfig.java` | Which URLs need authentication |
+| `docker-compose.yml` | Starts all services together |
+| `build.yml` | CI/CD pipeline definition |
+
+---
+
+## ✨ Features
+
+### 🔐 Authentication & Security
+```
+✅ JWT-based stateless authentication
+✅ Role-based access control (ADMIN, USER, VIEWER)
+✅ BCrypt password encryption
+✅ Protected API endpoints
+✅ Token expiration & refresh
+```
+
+### 🎫 Incident Management
+```
+✅ Create incidents with severity (P1-P4)
+✅ Status lifecycle: TRIGGERED → ACKNOWLEDGED → RESOLVED → CLOSED
+✅ Assign incidents to team members
+✅ Escalate unresolved incidents
+✅ Filter by status, severity, assignee
+✅ Pagination & sorting
+```
+
+### 🔔 Real-Time Notifications
+```
+✅ Email notifications (simulated)
+✅ SMS notifications (simulated)
+✅ Slack notifications (simulated)
+✅ Event-driven via Apache Kafka
+✅ Async processing (non-blocking)
+```
+
+### ⚡ Performance
+```
+✅ Redis caching (1-2ms response)
+✅ Cache invalidation on updates
+✅ Database connection pooling
+✅ Optimized JPA queries
+```
+
+### 🐳 DevOps
+```
+✅ Docker containerization
+✅ Docker Compose orchestration
+✅ GitHub Actions CI/CD
+✅ Health check endpoints
+✅ Swagger API documentation
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+| Software | Version | Required |
+|----------|---------|----------|
+| Docker Desktop | Latest | ✅ Yes |
+| Git | Latest | ✅ Yes |
+| Java 17 | 17+ | ⚪ For local dev only |
+| Node.js | 18+ | ⚪ For local dev only |
+| Maven | 3.9+ | ⚪ For local dev only |
+
+### 🐳 Run with Docker (Recommended)
+```bash
+# Clone
+git clone https://github.com/YOUR_USERNAME/incident-management-system.git
+cd incident-management-system
+
+# Start all services (takes 3-5 minutes first time)
+docker-compose up --build
+
+# Verify all services are running
+docker-compose ps
+```
+
+**Services Started:**
+
+| Service | Port | URL |
+|---------|------|-----|
+| React Dashboard | 3000 | http://localhost:3000 |
+| incident-service | 8081 | http://localhost:8081 |
+| notification-service | 8082 | http://localhost:8082 |
+| Swagger UI | 8081 | http://localhost:8081/swagger-ui.html |
+| PostgreSQL | 5432 | - |
+| Redis | 6379 | - |
+| Kafka | 9092 | - |
+
+### 💻 Run Locally (For Development)
+
+<details>
+<summary>Click to expand local setup instructions</summary>
+
+**Terminal 1 - Redis:**
+```bash
+redis-server
+```
+
+**Terminal 2 - Kafka:**
+```bash
+cd C:\kafka
+.\bin\windows\kafka-server-start.bat .\config\kraft\server.properties
+```
+
+**Terminal 3 - incident-service:**
+```bash
+cd incident-service
+mvn spring-boot:run
+```
+
+**Terminal 4 - notification-service:**
+```bash
+cd notification-service
+mvn spring-boot:run
+```
+
+**Terminal 5 - React:**
+```bash
+cd incident-dashboard
+npm install
+npm start
+```
+
+</details>
+
+---
+
+## 📖 API Reference
+
+### Base URL
+```
+http://localhost:8081/api
+```
+
+### 🔑 Authentication Endpoints
+
+<details>
+<summary><code>POST</code> <code>/api/auth/register</code> - Register new user</summary>
+
+**Request:**
+```json
+{
+    "username": "admin",
+    "email": "admin@company.com",
+    "password": "admin123",
+    "role": "ADMIN"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "token": "eyJhbGciOiJIUzM4NCJ9.eyJzdWIiOiJhZG1pbiI...",
+        "username": "admin",
+        "email": "admin@company.com",
+        "role": "ADMIN"
+    }
+}
+```
+
+**Roles Available:** `ADMIN`, `USER`, `VIEWER`
+
+</details>
+
+<details>
+<summary><code>POST</code> <code>/api/auth/login</code> - Login</summary>
+
+**Request:**
+```json
+{
+    "username": "admin",
+    "password": "admin123"
+}
+```
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "token": "eyJhbGciOiJIUzM4NCJ9...",
+        "username": "admin",
+        "email": "admin@company.com",
+        "role": "ADMIN"
+    }
+}
+```
+
+</details>
+
+### 🎫 Incident Endpoints
+
+> **Note:** All incident endpoints require `Authorization: Bearer <token>` header
+
+<details>
+<summary><code>POST</code> <code>/api/incidents</code> - Create incident</summary>
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Request:**
+```json
+{
+    "title": "Database server down",
+    "description": "Production DB not responding",
+    "severity": "P1"
+}
+```
+
+**Severity Levels:**
+
+| Level | Description | Response Time |
+|-------|-------------|---------------|
+| P1 | Critical | 15 minutes |
+| P2 | High | 1 hour |
+| P3 | Medium | 4 hours |
+| P4 | Low | 24 hours |
+
+**Response:** `201 Created`
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "incidentNumber": "INC-20260113-0001",
+        "title": "Database server down",
+        "severity": "P1",
+        "status": "TRIGGERED",
+        "createdAt": "2026-01-13T10:30:00Z"
+    },
+    "message": "Incident created"
+}
+```
+
+</details>
+
+<details>
+<summary><code>GET</code> <code>/api/incidents</code> - Get all incidents</summary>
+
+**Query Parameters:**
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| page | 0 | Page number |
+| size | 20 | Items per page |
+| sortBy | createdAt | Sort field |
+| sortDir | desc | Sort direction |
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "content": [...],
+        "page": 0,
+        "size": 20,
+        "totalElements": 100,
+        "totalPages": 5
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><code>GET</code> <code>/api/incidents/{id}</code> - Get incident by ID</summary>
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "incidentNumber": "INC-20260113-0001",
+        "title": "Database server down",
+        "severity": "P1",
+        "status": "TRIGGERED",
+        "assigneeId": null,
+        "escalationLevel": 0,
+        "createdAt": "2026-01-13T10:30:00Z"
+    }
+}
+```
+
+</details>
+
+<details>
+<summary><code>PATCH</code> <code>/api/incidents/{id}/acknowledge</code> - Acknowledge</summary>
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "status": "ACKNOWLEDGED",
+        "acknowledgedAt": "2026-01-13T10:35:00Z"
+    },
+    "message": "Incident acknowledged"
+}
+```
+
+</details>
+
+<details>
+<summary><code>PATCH</code> <code>/api/incidents/{id}/resolve</code> - Resolve</summary>
+
+**Query:** `?resolution=Fixed the database connection`
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "status": "RESOLVED",
+        "resolvedAt": "2026-01-13T11:00:00Z"
+    },
+    "message": "Incident resolved"
+}
+```
+
+</details>
+
+<details>
+<summary><code>PATCH</code> <code>/api/incidents/{id}/close</code> - Close</summary>
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "status": "CLOSED",
+        "closedAt": "2026-01-13T11:30:00Z"
+    },
+    "message": "Incident closed"
+}
+```
+
+</details>
+
+<details>
+<summary><code>PATCH</code> <code>/api/incidents/{id}/escalate</code> - Escalate</summary>
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "escalationLevel": 1,
+        "status": "ESCALATED"
+    },
+    "message": "Incident escalated"
+}
+```
+
+</details>
+
+<details>
+<summary><code>PATCH</code> <code>/api/incidents/{id}/assign</code> - Assign</summary>
+
+**Query:** `?assigneeId=2`
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": {
+        "id": 1,
+        "assigneeId": 2,
+        "assigneeName": "john.doe"
+    },
+    "message": "Incident assigned"
+}
+```
+
+</details>
+
+---
+
+## 🧪 Testing with Swagger UI
+
+### Step 1: Open Swagger
+```
+http://localhost:8081/swagger-ui.html
+```
+
+### Step 2: Register User
+1. Expand **Authentication** section
+2. Click **POST /api/auth/register**
+3. Click **Try it out**
+4. Enter:
+```json
+{
+    "username": "admin",
+    "email": "admin@test.com",
+    "password": "admin123",
+    "role": "ADMIN"
+}
+```
+5. Click **Execute**
+6. **Copy the token** from response
+
+### Step 3: Authorize
+1. Click **Authorize** button (top right 🔒)
+2. Enter: `Bearer <paste-your-token-here>`
+3. Click **Authorize**
+4. Click **Close**
+
+### Step 4: Test APIs
+Now you can test any endpoint!
+
+---
+
+## 🔧 Testing with Postman
+
+### Setup Environment Variables
+
+Create these variables in Postman:
+
+| Variable | Value |
+|----------|-------|
 | `base_url` | `http://localhost:8081` |
-| `token` | (leave empty, will be set after login) |
+| `token` | (leave empty, set after login) |
 
-### Step 3: Test Authentication
+### API Requests
 
-#### 3.1 Register User
+<details>
+<summary><strong>Register User</strong></summary>
 ```
 Method: POST
 URL: {{base_url}}/api/auth/register
@@ -32,22 +819,10 @@ Body (raw JSON):
 }
 ```
 
-**Expected Response (200 OK):**
-```json
-{
-    "success": true,
-    "data": {
-        "token": "eyJhbGciOiJIUzM4NCJ9...",
-        "username": "admin",
-        "email": "admin@test.com",
-        "role": "ADMIN"
-    }
-}
-```
+</details>
 
-**Copy the token and save it in Postman environment variable `token`**
-
-#### 3.2 Login
+<details>
+<summary><strong>Login</strong></summary>
 ```
 Method: POST
 URL: {{base_url}}/api/auth/login
@@ -60,20 +835,18 @@ Body (raw JSON):
 }
 ```
 
-#### 3.3 Auto-Save Token (Postman Script)
-
-Add this to **Tests** tab in Login request:
+**Auto-save token - Add to Tests tab:**
 ```javascript
 var jsonData = pm.response.json();
 if (jsonData.success) {
     pm.environment.set("token", jsonData.data.token);
-    console.log("Token saved!");
 }
 ```
 
-### Step 4: Test Incident APIs
+</details>
 
-#### 4.1 Create Incident
+<details>
+<summary><strong>Create Incident</strong></summary>
 ```
 Method: POST
 URL: {{base_url}}/api/incidents
@@ -83,28 +856,15 @@ Headers:
 Body (raw JSON):
 {
     "title": "Production Database Down",
-    "description": "MySQL server not responding on prod-db-01",
+    "description": "MySQL server not responding",
     "severity": "P1"
 }
 ```
 
-**Expected Response (201 Created):**
-```json
-{
-    "success": true,
-    "data": {
-        "id": 1,
-        "incidentNumber": "INC-20260113-0001",
-        "title": "Production Database Down",
-        "severity": "P1",
-        "status": "TRIGGERED",
-        "createdAt": "2026-01-13T10:30:00Z"
-    },
-    "message": "Incident created"
-}
-```
+</details>
 
-#### 4.2 Get All Incidents
+<details>
+<summary><strong>Get All Incidents</strong></summary>
 ```
 Method: GET
 URL: {{base_url}}/api/incidents?page=0&size=10
@@ -112,7 +872,10 @@ Headers:
     Authorization: Bearer {{token}}
 ```
 
-#### 4.3 Get Incident by ID
+</details>
+
+<details>
+<summary><strong>Get Incident by ID</strong></summary>
 ```
 Method: GET
 URL: {{base_url}}/api/incidents/1
@@ -120,7 +883,10 @@ Headers:
     Authorization: Bearer {{token}}
 ```
 
-#### 4.4 Acknowledge Incident
+</details>
+
+<details>
+<summary><strong>Acknowledge Incident</strong></summary>
 ```
 Method: PATCH
 URL: {{base_url}}/api/incidents/1/acknowledge
@@ -128,15 +894,21 @@ Headers:
     Authorization: Bearer {{token}}
 ```
 
-#### 4.5 Resolve Incident
+</details>
+
+<details>
+<summary><strong>Resolve Incident</strong></summary>
 ```
 Method: PATCH
-URL: {{base_url}}/api/incidents/1/resolve?resolution=Restarted database server
+URL: {{base_url}}/api/incidents/1/resolve?resolution=Fixed%20the%20issue
 Headers:
     Authorization: Bearer {{token}}
 ```
 
-#### 4.6 Close Incident
+</details>
+
+<details>
+<summary><strong>Close Incident</strong></summary>
 ```
 Method: PATCH
 URL: {{base_url}}/api/incidents/1/close
@@ -144,7 +916,10 @@ Headers:
     Authorization: Bearer {{token}}
 ```
 
-#### 4.7 Escalate Incident
+</details>
+
+<details>
+<summary><strong>Escalate Incident</strong></summary>
 ```
 Method: PATCH
 URL: {{base_url}}/api/incidents/1/escalate
@@ -152,7 +927,10 @@ Headers:
     Authorization: Bearer {{token}}
 ```
 
-#### 4.8 Assign Incident
+</details>
+
+<details>
+<summary><strong>Assign Incident</strong></summary>
 ```
 Method: PATCH
 URL: {{base_url}}/api/incidents/1/assign?assigneeId=2
@@ -160,219 +938,55 @@ Headers:
     Authorization: Bearer {{token}}
 ```
 
-#### 4.9 Filter Incidents
-```
-Method: GET
-URL: {{base_url}}/api/incidents/filter?status=TRIGGERED&severity=P1
-Headers:
-    Authorization: Bearer {{token}}
-```
-
-#### 4.10 Get Active Incidents
-```
-Method: GET
-URL: {{base_url}}/api/incidents/active
-Headers:
-    Authorization: Bearer {{token}}
-```
-
-### Step 5: Postman Collection JSON
-
-<details>
-<summary>Click to expand - Import this JSON into Postman</summary>
-```json
-{
-    "info": {
-        "name": "Incident Management System",
-        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-    },
-    "item": [
-        {
-            "name": "Auth",
-            "item": [
-                {
-                    "name": "Register",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"username\": \"admin\",\n    \"email\": \"admin@test.com\",\n    \"password\": \"admin123\",\n    \"role\": \"ADMIN\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/auth/register",
-                            "host": ["{{base_url}}"],
-                            "path": ["api", "auth", "register"]
-                        }
-                    }
-                },
-                {
-                    "name": "Login",
-                    "event": [
-                        {
-                            "listen": "test",
-                            "script": {
-                                "exec": [
-                                    "var jsonData = pm.response.json();",
-                                    "if (jsonData.success) {",
-                                    "    pm.environment.set(\"token\", jsonData.data.token);",
-                                    "}"
-                                ]
-                            }
-                        }
-                    ],
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/auth/login",
-                            "host": ["{{base_url}}"],
-                            "path": ["api", "auth", "login"]
-                        }
-                    }
-                }
-            ]
-        },
-        {
-            "name": "Incidents",
-            "item": [
-                {
-                    "name": "Create Incident",
-                    "request": {
-                        "method": "POST",
-                        "header": [
-                            {
-                                "key": "Content-Type",
-                                "value": "application/json"
-                            },
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}"
-                            }
-                        ],
-                        "body": {
-                            "mode": "raw",
-                            "raw": "{\n    \"title\": \"Server Down\",\n    \"description\": \"Production server not responding\",\n    \"severity\": \"P1\"\n}"
-                        },
-                        "url": {
-                            "raw": "{{base_url}}/api/incidents",
-                            "host": ["{{base_url}}"],
-                            "path": ["api", "incidents"]
-                        }
-                    }
-                },
-                {
-                    "name": "Get All Incidents",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/incidents",
-                            "host": ["{{base_url}}"],
-                            "path": ["api", "incidents"]
-                        }
-                    }
-                },
-                {
-                    "name": "Get Incident by ID",
-                    "request": {
-                        "method": "GET",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/incidents/1",
-                            "host": ["{{base_url}}"],
-                            "path": ["api", "incidents", "1"]
-                        }
-                    }
-                },
-                {
-                    "name": "Acknowledge Incident",
-                    "request": {
-                        "method": "PATCH",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/incidents/1/acknowledge",
-                            "host": ["{{base_url}}"],
-                            "path": ["api", "incidents", "1", "acknowledge"]
-                        }
-                    }
-                },
-                {
-                    "name": "Resolve Incident",
-                    "request": {
-                        "method": "PATCH",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/incidents/1/resolve?resolution=Fixed the issue",
-                            "host": ["{{base_url}}"],
-                            "path": ["api", "incidents", "1", "resolve"],
-                            "query": [
-                                {
-                                    "key": "resolution",
-                                    "value": "Fixed the issue"
-                                }
-                            ]
-                        }
-                    }
-                },
-                {
-                    "name": "Close Incident",
-                    "request": {
-                        "method": "PATCH",
-                        "header": [
-                            {
-                                "key": "Authorization",
-                                "value": "Bearer {{token}}"
-                            }
-                        ],
-                        "url": {
-                            "raw": "{{base_url}}/api/incidents/1/close",
-                            "host": ["{{base_url}}"],
-                            "path": ["api", "incidents", "1", "close"]
-                        }
-                    }
-                }
-            ]
-        }
-    ]
-}
-```
-
 </details>
+
+---
+
+## 💻 Testing with cURL
+```bash
+# 1. Register
+curl -X POST http://localhost:8081/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","email":"admin@test.com","password":"admin123","role":"ADMIN"}'
+
+# 2. Login (copy token from response)
+curl -X POST http://localhost:8081/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"admin123"}'
+
+# 3. Create Incident (replace YOUR_TOKEN)
+curl -X POST http://localhost:8081/api/incidents \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -d '{"title":"Server Down","severity":"P1"}'
+
+# 4. Get All Incidents
+curl -X GET http://localhost:8081/api/incidents \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 5. Acknowledge
+curl -X PATCH http://localhost:8081/api/incidents/1/acknowledge \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 6. Resolve
+curl -X PATCH "http://localhost:8081/api/incidents/1/resolve?resolution=Fixed" \
+  -H "Authorization: Bearer YOUR_TOKEN"
+
+# 7. Close
+curl -X PATCH http://localhost:8081/api/incidents/1/close \
+  -H "Authorization: Bearer YOUR_TOKEN"
+```
+
+### Verify Kafka Notifications
+```bash
+docker-compose logs notification-service --tail=50
+
+# Expected output:
+# 📥 Received event: CREATED for incident: INC-20260113-0001
+# 📧 EMAIL SENT - To: oncall-team@company.com
+# 📱 SMS SENT - To: +91-9999999999  
+# 💬 SLACK MESSAGE SENT - Channel: #incidents
+```
 
 ---
 
@@ -400,421 +1014,204 @@ Headers:
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Common Errors & How to Fix
+### Common Errors & Solutions
 
-#### Error 1: 401 Unauthorized
-```json
-{
-    "status": 401,
-    "error": "Unauthorized",
-    "message": "Full authentication is required"
-}
-```
+| Error | Cause | Solution |
+|-------|-------|----------|
+| 401 Unauthorized | Missing token | Add `Authorization: Bearer <token>` |
+| 401 Unauthorized | Token expired | Login again to get new token |
+| 403 Forbidden | Wrong role | Use account with correct role |
+| 404 Not Found | Wrong ID | Check if resource exists |
+| 500 Internal Error | Check logs | `docker-compose logs incident-service` |
 
-**Causes:**
-1. No Authorization header
-2. Token expired
-3. Token malformed
-
-**How to Debug:**
+### Debugging Checklist
 ```bash
-# Check if token is present
-echo $TOKEN
-
-# Decode JWT token (use jwt.io or)
-# Check expiration time in payload
-```
-
-**Fix:**
-```bash
-# Get new token
-curl -X POST http://localhost:8081/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"username":"admin","password":"admin123"}'
-```
-
----
-
-#### Error 2: 403 Forbidden
-```json
-{
-    "status": 403,
-    "error": "Forbidden",
-    "message": "Access Denied"
-}
-```
-
-**Causes:**
-1. User doesn't have required role
-2. CORS issue (frontend)
-3. Swagger URL not whitelisted
-
-**How to Debug:**
-```bash
-# Check user role in token
-# Decode JWT at jwt.io
-# Look for "role" in payload
-
-# Check SecurityConfig.java
-# Verify URL is in permitAll() or correct role
-```
-
-**Fix:**
-```java
-// In SecurityConfig.java, add URL to permitAll
-.requestMatchers("/your-url/**").permitAll()
-
-// Or check user has correct role
-.requestMatchers("/admin/**").hasRole("ADMIN")
-```
-
----
-
-#### Error 3: 500 Internal Server Error
-```json
-{
-    "status": 500,
-    "error": "Internal Server Error",
-    "message": "Something went wrong"
-}
-```
-
-**Causes:**
-1. NullPointerException
-2. Database connection failed
-3. Kafka not available
-4. Redis not available
-
-**How to Debug:**
-```bash
-# Step 1: Check application logs
-docker-compose logs incident-service --tail=100
-
-# Step 2: Look for stack trace
-# Find the FIRST line with YOUR package name
-# Example: at com.incident.incidentservice.service.IncidentService.createIncident(IncidentService.java:45)
-
-# Step 3: Check that specific line in code
-```
-
-**Common 500 Errors:**
-
-| Error in Logs | Cause | Fix |
-|---------------|-------|-----|
-| `NullPointerException` | Variable is null | Add null check or fix initialization |
-| `Connection refused :5432` | PostgreSQL down | Start PostgreSQL |
-| `Connection refused :6379` | Redis down | Start Redis |
-| `Connection refused :9092` | Kafka down | Start Kafka |
-| `Table doesn't exist` | Migration not run | Check Hibernate ddl-auto |
-| `Duplicate key` | Unique constraint violated | Check data or add validation |
-
----
-
-#### Error 4: Connection Refused
-```
-org.postgresql.util.PSQLException: Connection to localhost:5432 refused
-```
-
-**How to Debug:**
-```bash
-# Step 1: Check if service is running
+# 1. Check all services running
 docker-compose ps
 
-# Step 2: Check service logs
-docker-compose logs postgres
+# 2. Check application logs
+docker-compose logs incident-service --tail=100
 
-# Step 3: Test connection manually
-docker exec -it incident-postgres psql -U postgres -d incident_db
+# 3. Check health endpoint
+curl http://localhost:8081/actuator/health
 
-# Step 4: Check environment variables
-docker exec incident-service env | grep DB_
+# 4. Check database connection
+docker exec -it incident-postgres psql -U postgres -c "SELECT 1"
+
+# 5. Check Redis connection
+docker exec -it incident-redis redis-cli PING
+
+# 6. Check Kafka topics
+docker exec incident-kafka kafka-topics.sh --list --bootstrap-server localhost:9092
 ```
-
-**Fix:**
-```bash
-# Restart the service
-docker-compose restart postgres
-
-# Or recreate everything
-docker-compose down
-docker-compose up --build
-```
-
----
-
-#### Error 5: Kafka Not Receiving Messages
-
-**Symptoms:**
-- Incident created successfully
-- But notification-service shows no logs
-
-**How to Debug:**
-```bash
-# Step 1: Check Kafka is running
-docker-compose ps | grep kafka
-
-# Step 2: Check topic exists
-docker exec -it incident-kafka kafka-topics.sh --list --bootstrap-server localhost:9092
-
-# Step 3: Check incident-service producer logs
-docker-compose logs incident-service | grep -i kafka
-
-# Step 4: Check notification-service consumer logs
-docker-compose logs notification-service | grep -i kafka
-
-# Step 5: Manually produce a message
-docker exec -it incident-kafka kafka-console-producer.sh \
-  --bootstrap-server localhost:9092 \
-  --topic incident-events
-
-# Step 6: Manually consume messages
-docker exec -it incident-kafka kafka-console-consumer.sh \
-  --bootstrap-server localhost:9092 \
-  --topic incident-events \
-  --from-beginning
-```
-
-**Common Kafka Issues:**
-
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| Topic not found | Auto-create disabled | Create topic manually or enable auto-create |
-| Serialization error | Event class mismatch | Check IncidentEvent class in both services |
-| Connection refused | Wrong bootstrap server | Check KAFKA_SERVERS env variable |
-| Consumer not receiving | Wrong group ID | Check consumer group configuration |
-
----
-
-#### Error 6: Redis Cache Issues
-
-**Symptoms:**
-- First request slow (50ms)
-- Second request also slow (should be 1-2ms)
-
-**How to Debug:**
-```bash
-# Step 1: Check Redis is running
-docker-compose ps | grep redis
-
-# Step 2: Connect to Redis
-docker exec -it incident-redis redis-cli
-
-# Step 3: Check if keys exist
-127.0.0.1:6379> KEYS *
-
-# Step 4: Check specific cache
-127.0.0.1:6379> GET incident:1
-
-# Step 5: Check Redis logs
-docker-compose logs incident-redis
-```
-
-**Fix:**
-```bash
-# Clear Redis cache
-docker exec -it incident-redis redis-cli FLUSHALL
-
-# Restart Redis
-docker-compose restart incident-redis
-```
-
----
-
-### Production Debugging Checklist
-```
-┌─────────────────────────────────────────────────────────────────────────────┐
-│                    🔍 DEBUGGING CHECKLIST                                   │
-├─────────────────────────────────────────────────────────────────────────────┤
-│                                                                             │
-│  □ 1. Check if ALL services are running                                    │
-│       docker-compose ps                                                    │
-│                                                                             │
-│  □ 2. Check application logs for errors                                    │
-│       docker-compose logs <service-name> --tail=100                        │
-│                                                                             │
-│  □ 3. Check health endpoint                                                │
-│       curl http://localhost:8081/actuator/health                           │
-│                                                                             │
-│  □ 4. Check database connection                                            │
-│       docker exec -it incident-postgres psql -U postgres -c "SELECT 1"     │
-│                                                                             │
-│  □ 5. Check Redis connection                                               │
-│       docker exec -it incident-redis redis-cli PING                        │
-│                                                                             │
-│  □ 6. Check Kafka connection                                               │
-│       docker exec -it incident-kafka kafka-topics.sh --list \              │
-│         --bootstrap-server localhost:9092                                  │
-│                                                                             │
-│  □ 7. Check environment variables                                          │
-│       docker exec incident-service env                                     │
-│                                                                             │
-│  □ 8. Check network connectivity                                           │
-│       docker network ls                                                    │
-│       docker network inspect incident-management-system_default            │
-│                                                                             │
-│  □ 9. Check resource usage                                                 │
-│       docker stats                                                         │
-│                                                                             │
-│  □ 10. Check disk space                                                    │
-│        docker system df                                                    │
-│                                                                             │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
----
 
 ### Real-World Debugging Scenarios
 
-#### Scenario 1: API Suddenly Stopped Working
-
-**Symptoms:** All APIs return 500 error
+<details>
+<summary><strong>Scenario 1: API Returns 500 Error</strong></summary>
 
 **Debug Steps:**
 ```bash
 # 1. Check logs
 docker-compose logs incident-service --tail=50
 
-# 2. Found: "Connection pool exhausted"
+# 2. Look for exception
+# Found: "Connection refused: localhost:5432"
 
-# 3. Check database connections
-docker exec -it incident-postgres psql -U postgres -c "SELECT count(*) FROM pg_stat_activity;"
-
-# 4. Found: 100 connections (max is 100)
-
-# 5. Root Cause: Connection leak in code
-
-# 6. Temporary Fix: Restart service
-docker-compose restart incident-service
-
-# 7. Permanent Fix: Add connection timeout in application.yml
-spring:
-  datasource:
-    hikari:
-      maximum-pool-size: 20
-      connection-timeout: 30000
+# 3. Fix
+docker-compose restart postgres
 ```
 
----
+</details>
 
-#### Scenario 2: Slow API Response
-
-**Symptoms:** GET /incidents/{id} taking 5 seconds
-
-**Debug Steps:**
-```bash
-# 1. Check if cache is working
-docker exec -it incident-redis redis-cli KEYS "*"
-
-# 2. Found: No keys (cache is empty)
-
-# 3. Check Redis logs
-docker-compose logs incident-redis
-
-# 4. Found: Redis restarted, cache cleared
-
-# 5. Check IncidentCacheService.java
-
-# 6. Found: Cache eviction on every update (bug)
-
-# 7. Fix: Only evict specific key, not all keys
-```
-
----
-
-#### Scenario 3: Notifications Not Sending
-
-**Symptoms:** Incident created but no notification
+<details>
+<summary><strong>Scenario 2: Notifications Not Sending</strong></summary>
 
 **Debug Steps:**
 ```bash
 # 1. Check notification-service logs
 docker-compose logs notification-service --tail=50
 
-# 2. Found: "Deserialization error"
+# 2. Check Kafka
+docker exec incident-kafka kafka-topics.sh --list --bootstrap-server localhost:9092
 
-# 3. Check event class in both services
-# incident-service: IncidentEvent has 5 fields
-# notification-service: IncidentEvent has 4 fields
-
-# 4. Root Cause: Field mismatch after code update
-
-# 5. Fix: Update notification-service IncidentEvent class
-
-# 6. Rebuild
-mvn clean package -DskipTests
-docker-compose up --build
+# 3. Fix
+docker-compose restart kafka
 ```
 
----
+</details>
 
-#### Scenario 4: Memory Issues
-
-**Symptoms:** Service crashes after few hours
+<details>
+<summary><strong>Scenario 3: Slow API Response</strong></summary>
 
 **Debug Steps:**
 ```bash
-# 1. Check memory usage
-docker stats
+# 1. Check Redis cache
+docker exec incident-redis redis-cli KEYS "*"
 
-# 2. Found: incident-service using 2GB (limit is 512MB)
-
-# 3. Check for memory leaks
-# Add JVM flags to see heap usage
-
-# 4. In Dockerfile, add:
-ENTRYPOINT ["java", "-Xmx256m", "-Xms128m", "-jar", "app.jar"]
-
-# 5. Common causes:
-#    - Large result sets not paginated
-#    - Caching too much data
-#    - Event listeners not cleaned up
+# 2. If empty, cache was cleared
+# First request will be slow, second should be fast
 ```
+
+</details>
 
 ---
 
-### Logging Best Practices
-```java
-// Good logging examples
-log.info("Creating incident: title={}, severity={}", request.getTitle(), request.getSeverity());
-log.debug("Cache HIT for incident ID: {}", id);
-log.warn("Incident {} escalated to level {}", incident.getIncidentNumber(), level);
-log.error("Failed to send notification for incident {}: {}", incidentId, e.getMessage(), e);
-
-// Bad logging (don't do this)
-log.info("Creating incident");  // No context
-log.info(request.toString());   // May expose sensitive data
-log.error(e.toString());        // No stack trace
-```
-
-**Enable Debug Logging:**
-```yaml
-# application.yml
-logging:
-  level:
-    com.incident: DEBUG
-    org.springframework.web: DEBUG
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql: TRACE
-```
-
----
-
-### Health Check Endpoints
+## 🐳 Docker Commands
 ```bash
-# Application health
-curl http://localhost:8081/actuator/health
+# Start
+docker-compose up --build          # Build & start
+docker-compose up -d               # Start in background
 
-# Detailed health (if enabled)
-curl http://localhost:8081/actuator/health/db
-curl http://localhost:8081/actuator/health/redis
-curl http://localhost:8081/actuator/health/kafka
+# Stop
+docker-compose down                # Stop all
+docker-compose down -v             # Stop & remove volumes
 
-# Application info
-curl http://localhost:8081/actuator/info
+# Logs
+docker-compose logs                # All logs
+docker-compose logs -f             # Follow logs
+docker-compose logs incident-service --tail=50
 
-# Metrics
-curl http://localhost:8081/actuator/metrics
-curl http://localhost:8081/actuator/metrics/jvm.memory.used
+# Debug
+docker-compose ps                  # List services
+docker exec -it incident-service sh  # Shell into container
+
+# Clean
+docker system prune -f             # Remove unused data
 ```
 
 ---
+
+## 🔄 Development Workflow
+```bash
+# After code changes:
+
+# 1. Build JARs
+cd incident-service && mvn clean package -DskipTests && cd ..
+cd notification-service && mvn clean package -DskipTests && cd ..
+
+# 2. Push to GitHub
+git add . && git commit -m "Your changes" && git push
+
+# 3. Rebuild Docker
+docker-compose down && docker-compose up --build
+```
+
+---
+
+## 📊 Performance Metrics
+
+| Metric | Without Cache | With Redis Cache | Improvement |
+|--------|---------------|------------------|-------------|
+| GET /incidents/{id} | 50-100ms | 1-2ms | **50x faster** |
+| Database queries | Every request | First request only | **Reduced load** |
+
+---
+
+## 🔮 Future Roadmap
+
+### Phase 2 - Enhanced Features
+- [ ] Real Twilio SMS integration
+- [ ] Real SendGrid email integration  
+- [ ] Real Slack API integration
+- [ ] Incident comments & attachments
+
+### Phase 3 - Scalability
+- [ ] Kubernetes deployment
+- [ ] Database read replicas
+- [ ] Redis cluster
+
+### Phase 4 - Observability
+- [ ] Prometheus metrics
+- [ ] Grafana dashboards
+- [ ] ELK stack logging
+
+---
+
+## 👨‍💻 Author
+
+**Rushikesh**
+
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/YOUR_USERNAME)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/YOUR_LINKEDIN)
+
+---
+
+## 📄 License
+
+Distributed under the MIT License.
+
+---
+
+## ⭐ Support
+
+If this project helped you, please give it a ⭐!
+
+---
+
+<p align="center">Made with ❤️ and ☕</p>
+```
+
+---
+
+## Correct Order Now:
+```
+1.  Quick Demo
+2.  What is This
+3.  Why I Built This
+4.  What I Learned
+5.  Tech Stack
+6.  System Architecture       ← HOW it works
+7.  Project Structure         ← WHERE the code is (FIXED!)
+8.  Features                  ← WHAT it does
+9.  Getting Started
+10. API Reference
+11. Testing with Swagger
+12. Testing with Postman
+13. Testing with cURL
+14. Production Debugging
+15. Docker Commands
+16. Development Workflow
+17. Performance Metrics
+18. Future Roadmap
+19. Author

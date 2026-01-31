@@ -28,6 +28,9 @@
 - [Testing with cURL](#-testing-with-curl)
 - [Production Debugging Guide](#-production-level-debugging-guide)
 - [Docker Commands](#-docker-commands)
+- [Environment Variables](#️-environment-variables)
+- [Database Schema](#️-database-schema)
+- [Postman Collection](#-postman-collection)
 - [Development Workflow](#-development-workflow)
 - [Performance Metrics](#-performance-metrics)
 - [Future Roadmap](#-future-roadmap)
@@ -661,6 +664,55 @@ Content-Type: application/json
 </details>
 
 <details>
+<summary><code>GET</code> <code>/api/incidents/active</code> - Get active incidents</summary>
+
+**Response:** `200 OK`
+```json
+{
+    "success": true,
+    "data": [
+        {
+            "id": 1,
+            "incidentNumber": "INC-20260113-0001",
+            "title": "Database server down",
+            "status": "TRIGGERED"
+        }
+    ]
+}
+```
+
+</details>
+
+<details>
+<summary><code>GET</code> <code>/api/incidents/filter</code> - Filter incidents</summary>
+
+**Query Parameters:**
+
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| status | No | TRIGGERED, ACKNOWLEDGED, RESOLVED, CLOSED |
+| severity | No | P1, P2, P3, P4 |
+| assigneeId | No | User ID |
+
+**Example:** `/api/incidents/filter?status=TRIGGERED&severity=P1`
+
+</details>
+
+<details>
+<summary><code>PUT</code> <code>/api/incidents/{id}</code> - Update incident</summary>
+
+**Request:**
+```json
+{
+    "title": "Updated title",
+    "description": "Updated description",
+    "severity": "P2"
+}
+```
+
+</details>
+
+<details>
 <summary><code>PATCH</code> <code>/api/incidents/{id}/acknowledge</code> - Acknowledge</summary>
 
 **Response:** `200 OK`
@@ -786,7 +838,7 @@ http://localhost:8081/swagger-ui.html
 4. Click **Close**
 
 ### Step 4: Test APIs
-Now you can test any endpoint!
+Now you can test any endpoint - the token is automatically included!
 
 ---
 
@@ -804,7 +856,7 @@ Create these variables in Postman:
 ### API Requests
 
 <details>
-<summary><strong>Register User</strong></summary>
+<summary><strong>1. Register User</strong></summary>
 ```
 Method: POST
 URL: {{base_url}}/api/auth/register
@@ -822,7 +874,7 @@ Body (raw JSON):
 </details>
 
 <details>
-<summary><strong>Login</strong></summary>
+<summary><strong>2. Login</strong></summary>
 ```
 Method: POST
 URL: {{base_url}}/api/auth/login
@@ -839,14 +891,14 @@ Body (raw JSON):
 ```javascript
 var jsonData = pm.response.json();
 if (jsonData.success) {
-    pm.environment.set("token", jsonData.data.token);
+    pm.collectionVariables.set("token", jsonData.data.token);
 }
 ```
 
 </details>
 
 <details>
-<summary><strong>Create Incident</strong></summary>
+<summary><strong>3. Create Incident</strong></summary>
 ```
 Method: POST
 URL: {{base_url}}/api/incidents
@@ -864,7 +916,7 @@ Body (raw JSON):
 </details>
 
 <details>
-<summary><strong>Get All Incidents</strong></summary>
+<summary><strong>4. Get All Incidents</strong></summary>
 ```
 Method: GET
 URL: {{base_url}}/api/incidents?page=0&size=10
@@ -875,7 +927,7 @@ Headers:
 </details>
 
 <details>
-<summary><strong>Get Incident by ID</strong></summary>
+<summary><strong>5. Get Incident by ID</strong></summary>
 ```
 Method: GET
 URL: {{base_url}}/api/incidents/1
@@ -886,7 +938,7 @@ Headers:
 </details>
 
 <details>
-<summary><strong>Acknowledge Incident</strong></summary>
+<summary><strong>6. Acknowledge Incident</strong></summary>
 ```
 Method: PATCH
 URL: {{base_url}}/api/incidents/1/acknowledge
@@ -897,7 +949,7 @@ Headers:
 </details>
 
 <details>
-<summary><strong>Resolve Incident</strong></summary>
+<summary><strong>7. Resolve Incident</strong></summary>
 ```
 Method: PATCH
 URL: {{base_url}}/api/incidents/1/resolve?resolution=Fixed%20the%20issue
@@ -908,7 +960,7 @@ Headers:
 </details>
 
 <details>
-<summary><strong>Close Incident</strong></summary>
+<summary><strong>8. Close Incident</strong></summary>
 ```
 Method: PATCH
 URL: {{base_url}}/api/incidents/1/close
@@ -919,7 +971,7 @@ Headers:
 </details>
 
 <details>
-<summary><strong>Escalate Incident</strong></summary>
+<summary><strong>9. Escalate Incident</strong></summary>
 ```
 Method: PATCH
 URL: {{base_url}}/api/incidents/1/escalate
@@ -930,7 +982,7 @@ Headers:
 </details>
 
 <details>
-<summary><strong>Assign Incident</strong></summary>
+<summary><strong>10. Assign Incident</strong></summary>
 ```
 Method: PATCH
 URL: {{base_url}}/api/incidents/1/assign?assigneeId=2
@@ -1122,6 +1174,391 @@ docker system prune -f             # Remove unused data
 
 ---
 
+## ⚙️ Environment Variables
+
+### incident-service
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `DB_HOST` | PostgreSQL host | `localhost` |
+| `DB_PORT` | PostgreSQL port | `5432` |
+| `DB_NAME` | Database name | `incident_db` |
+| `DB_USER` | Database username | `postgres` |
+| `DB_PASSWORD` | Database password | `postgres` |
+| `REDIS_HOST` | Redis host | `localhost` |
+| `REDIS_PORT` | Redis port | `6379` |
+| `KAFKA_SERVERS` | Kafka bootstrap servers | `localhost:9092` |
+| `JWT_SECRET` | Secret key for JWT signing | (configured in app) |
+| `JWT_EXPIRATION` | Token expiration in ms | `86400000` (24 hours) |
+
+### notification-service
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `KAFKA_SERVERS` | Kafka bootstrap servers | `localhost:9092` |
+| `KAFKA_GROUP_ID` | Consumer group ID | `notification-group` |
+
+### Docker Environment
+
+All environment variables are pre-configured in `docker-compose.yml`. No changes needed for local development.
+
+**For production, set these securely:**
+```bash
+export DB_PASSWORD=your_secure_password
+export JWT_SECRET=your_very_long_secret_key_at_least_32_characters
+```
+
+---
+
+## 🗄️ Database Schema
+
+### Users Table
+```sql
+CREATE TABLE users (
+    id              BIGSERIAL PRIMARY KEY,
+    username        VARCHAR(50) UNIQUE NOT NULL,
+    email           VARCHAR(100) UNIQUE NOT NULL,
+    password        VARCHAR(255) NOT NULL,
+    role            VARCHAR(20) NOT NULL,
+    team_id         VARCHAR(50),
+    team_name       VARCHAR(100),
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | BIGSERIAL | Primary key |
+| username | VARCHAR(50) | Unique username |
+| email | VARCHAR(100) | User email |
+| password | VARCHAR(255) | BCrypt encrypted |
+| role | VARCHAR(20) | ADMIN, USER, VIEWER |
+
+### Incidents Table
+```sql
+CREATE TABLE incidents (
+    id                  BIGSERIAL PRIMARY KEY,
+    incident_number     VARCHAR(50) UNIQUE NOT NULL,
+    title               VARCHAR(255) NOT NULL,
+    description         TEXT,
+    severity            VARCHAR(10) NOT NULL,
+    status              VARCHAR(20) NOT NULL,
+    assignee_id         BIGINT REFERENCES users(id),
+    assignee_name       VARCHAR(100),
+    team_id             VARCHAR(50),
+    team_name           VARCHAR(100),
+    escalation_level    INTEGER DEFAULT 0,
+    sla_breach          BOOLEAN DEFAULT FALSE,
+    resolution          TEXT,
+    created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    acknowledged_at     TIMESTAMP,
+    resolved_at         TIMESTAMP,
+    closed_at           TIMESTAMP,
+    updated_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+| Column | Type | Description |
+|--------|------|-------------|
+| id | BIGSERIAL | Primary key |
+| incident_number | VARCHAR(50) | Unique ID (INC-20260113-0001) |
+| title | VARCHAR(255) | Incident title |
+| description | TEXT | Detailed description |
+| severity | VARCHAR(10) | P1, P2, P3, P4 |
+| status | VARCHAR(20) | TRIGGERED, ACKNOWLEDGED, RESOLVED, CLOSED |
+| assignee_id | BIGINT | FK to users table |
+| escalation_level | INTEGER | 0, 1, 2, 3... |
+| sla_breach | BOOLEAN | SLA violated? |
+| resolution | TEXT | How it was fixed |
+
+### Entity Relationship Diagram
+```
+┌─────────────────┐         ┌─────────────────────┐
+│     USERS       │         │     INCIDENTS       │
+├─────────────────┤         ├─────────────────────┤
+│ id (PK)         │────┐    │ id (PK)             │
+│ username        │    │    │ incident_number     │
+│ email           │    │    │ title               │
+│ password        │    │    │ description         │
+│ role            │    │    │ severity            │
+│ team_id         │    │    │ status              │
+│ team_name       │    └───>│ assignee_id (FK)    │
+│ created_at      │         │ assignee_name       │
+│ updated_at      │         │ escalation_level    │
+└─────────────────┘         │ sla_breach          │
+                            │ resolution          │
+                            │ created_at          │
+                            │ acknowledged_at     │
+                            │ resolved_at         │
+                            │ closed_at           │
+                            └─────────────────────┘
+```
+
+---
+
+## 📬 Postman Collection
+
+### Quick Import
+
+1. Open Postman
+2. Click **Import**
+3. Select **Raw Text**
+4. Paste the JSON below
+5. Click **Import**
+
+<details>
+<summary><strong>Click to expand Postman Collection JSON</strong></summary>
+```json
+{
+    "info": {
+        "name": "Incident Management System",
+        "_postman_id": "incident-mgmt-collection",
+        "description": "Complete API collection for Incident Management System",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:8081"
+        },
+        {
+            "key": "token",
+            "value": ""
+        }
+    ],
+    "item": [
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register User",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"admin\",\n    \"email\": \"admin@test.com\",\n    \"password\": \"admin123\",\n    \"role\": \"ADMIN\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/register",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "register"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.success && jsonData.data.token) {",
+                                    "    pm.collectionVariables.set('token', jsonData.data.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                },
+                {
+                    "name": "Login",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"admin\",\n    \"password\": \"admin123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/auth/login",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "auth", "login"]
+                        }
+                    },
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "if (jsonData.success && jsonData.data.token) {",
+                                    "    pm.collectionVariables.set('token', jsonData.data.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "name": "Incidents",
+            "item": [
+                {
+                    "name": "Create Incident",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {"key": "Content-Type", "value": "application/json"},
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"title\": \"Database Server Down\",\n    \"description\": \"Production database not responding\",\n    \"severity\": \"P1\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/api/incidents",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "incidents"]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Incidents",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/incidents?page=0&size=20",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "incidents"],
+                            "query": [
+                                {"key": "page", "value": "0"},
+                                {"key": "size", "value": "20"}
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Incident by ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/incidents/1",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "incidents", "1"]
+                        }
+                    }
+                },
+                {
+                    "name": "Acknowledge Incident",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/incidents/1/acknowledge",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "incidents", "1", "acknowledge"]
+                        }
+                    }
+                },
+                {
+                    "name": "Resolve Incident",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/incidents/1/resolve?resolution=Fixed the issue",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "incidents", "1", "resolve"],
+                            "query": [
+                                {"key": "resolution", "value": "Fixed the issue"}
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Close Incident",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/incidents/1/close",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "incidents", "1", "close"]
+                        }
+                    }
+                },
+                {
+                    "name": "Escalate Incident",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/incidents/1/escalate",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "incidents", "1", "escalate"]
+                        }
+                    }
+                },
+                {
+                    "name": "Assign Incident",
+                    "request": {
+                        "method": "PATCH",
+                        "header": [
+                            {"key": "Authorization", "value": "Bearer {{token}}"}
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/api/incidents/1/assign?assigneeId=2",
+                            "host": ["{{base_url}}"],
+                            "path": ["api", "incidents", "1", "assign"],
+                            "query": [
+                                {"key": "assigneeId", "value": "2"}
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "Health Check",
+            "item": [
+                {
+                    "name": "Health",
+                    "request": {
+                        "method": "GET",
+                        "url": {
+                            "raw": "{{base_url}}/actuator/health",
+                            "host": ["{{base_url}}"],
+                            "path": ["actuator", "health"]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
+```
+
+</details>
+
+### How to Use
+
+1. **Import** the collection into Postman
+2. **Run Register** or **Login** first (token auto-saves)
+3. **Test any endpoint** - token is automatically included
+
+---
+
 ## 🔄 Development Workflow
 ```bash
 # After code changes:
@@ -1190,28 +1627,3 @@ If this project helped you, please give it a ⭐!
 ---
 
 <p align="center">Made with ❤️ and ☕</p>
-```
-
----
-
-## Correct Order Now:
-```
-1.  Quick Demo
-2.  What is This
-3.  Why I Built This
-4.  What I Learned
-5.  Tech Stack
-6.  System Architecture       ← HOW it works
-7.  Project Structure         ← WHERE the code is (FIXED!)
-8.  Features                  ← WHAT it does
-9.  Getting Started
-10. API Reference
-11. Testing with Swagger
-12. Testing with Postman
-13. Testing with cURL
-14. Production Debugging
-15. Docker Commands
-16. Development Workflow
-17. Performance Metrics
-18. Future Roadmap
-19. Author
